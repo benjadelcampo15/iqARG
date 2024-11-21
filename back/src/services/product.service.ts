@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ProductDto } from 'src/dtos/product.dto';
 import { Product } from 'src/entities/product';
 import { SubCategory } from 'src/entities/subCategory';
 import { products } from 'src/utils/products';
@@ -41,5 +42,26 @@ export class ProductService implements OnModuleInit {
     return await this.productRepository.find({
       relations: ['subCategory', 'subCategory.category'],
     });
+  }
+
+  async addProduct(product: ProductDto): Promise<Product> {
+    const subCategory = await this.subCategoryRepository.findOne({
+      where: { name: product.subCategory },
+    });
+
+   await this.productRepository.save({
+      name: product.name,
+      price: product.price,
+      stock: product.stock,
+      subCategory: subCategory,
+      
+    });
+
+    const newProduct = await this.productRepository.findOne({
+      where: { name: product.name },
+      relations: ['subCategory', 'subCategory.category'],
+    });
+    
+    return newProduct;
   }
 }
