@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductDto } from 'src/dtos/product.dto';
 import { Product } from 'src/entities/product';
@@ -44,24 +44,73 @@ export class ProductService implements OnModuleInit {
     });
   }
 
-  async addProduct(product: ProductDto): Promise<Product> {
-    const subCategory = await this.subCategoryRepository.findOne({
-      where: { name: product.subCategory },
-    });
-
-   await this.productRepository.save({
-      name: product.name,
-      price: product.price,
-      stock: product.stock,
-      subCategory: subCategory,
-      
-    });
-
-    const newProduct = await this.productRepository.findOne({
-      where: { name: product.name },
+  async getProductById(id: string): Promise<Product> {
+    const product = await this.productRepository.findOne({
+      where: { id },
       relations: ['subCategory', 'subCategory.category'],
     });
-    
-    return newProduct;
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+    return product;
   }
+
+  async addProduct(product: ProductDto): Promise<Product> {
+   try {
+     const subCategory = await this.subCategoryRepository.findOne({
+       where: { name: product.subCategory },
+     });
+ 
+     if (!subCategory) {
+       throw new NotFoundException(`SubCategory ${product.subCategory} not found`);
+     }
+    await this.productRepository.save({
+       name: product.name,
+       price: product.price,
+       stock: product.stock,
+       subCategory: subCategory,
+       
+     });
+ 
+     const newProduct = await this.productRepository.findOne({
+       where: { name: product.name },
+       relations: ['subCategory', 'subCategory.category'],
+     });
+     
+     return newProduct;
+   } catch (error) {
+    throw new Error(`Failed to add product: ${error.message}`);
+   }
+  }
+
+  async modifyProduct(id: string, product: Partial<Product>): Promise<Product> {
+    // Verificar si el producto existe antes de actualizar
+    const existingProduct = await this.productRepository.findOne({ where: { id } });
+    if (!existingProduct) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+  
+    // Actualizar el producto
+    await this.productRepository.update(id, product);
+  
+    // Retornar el producto actualizado
+    const updatedProduct = await this.productRepository.findOne({ where: { id }, relations: ['subCategory', 'subCategory.category'] });
+    if (!updatedProduct) {
+      throw new NotFoundException(`Failed to retrieve updated product with ID ${id}`);
+    }
+  
+    return updatedProduct;
+  }
+
+  async deleteProduct(id: string): Promise<void> {
+    // Verificar si el producto existe
+    const existingProduct = await this.productRepository.findOne({ where: { id } });
+    if (!existingProduct) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+  
+    // Eliminar el producto
+    await this.productRepository.delete(id);
+  }
+  
 }
