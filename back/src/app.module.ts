@@ -7,6 +7,8 @@ import typeormConfig from './config/typeorm';
 import { CategoryModule } from './modules/category.module';
 import { subCategoryModule } from './modules/subCategory.module';
 import { ProductModule } from './modules/product.module';
+import { View } from 'typeorm';
+import { ViewModule } from './modules/view.module';
 
 @Module({
   imports: [
@@ -19,7 +21,8 @@ import { ProductModule } from './modules/product.module';
   }),
   CategoryModule , 
   subCategoryModule,
-  ProductModule
+  ProductModule,
+  ViewModule
 ],
   
   controllers: [AppController],

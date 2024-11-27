@@ -1,21 +1,38 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { Category } from './category';
 import { SubCategory } from './subCategory';
+import { View } from './view';
 
 @Entity('products')
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuid();
 
-  @Column()
+  @Column({ nullable: false })
   name: string;
 
-  @Column()
+  @Column({ nullable: false })
   price: number;
 
-  @Column()
+  @Column({ nullable: true })
   stock: number;
+
+  @Column({ nullable: false })
+  brand: string;
+
+  // Actualiza los arrays para que usen "text[]" en PostgreSQL
+  @Column('text', { array: true, nullable: true })
+  color: string[];
+
+  @Column('text', { array: true, nullable: true })
+  material: string[];
+
+  @Column('text', { array: true, nullable: true })
+  size: string[];
+
+  @Column('text', { array: true, nullable: true })
+  measurement: string[];
 
   @Column({
     default:
@@ -26,5 +43,9 @@ export class Product {
   @ManyToOne(() => SubCategory, (subCategory) => subCategory.products)
   subCategory: SubCategory;
 
+  @ManyToOne(() => Category, (category) => category.products)
+  category: Category;
 
+  @OneToMany(() => View, (view) => view.product)
+  views: View[];
 }

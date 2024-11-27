@@ -4,6 +4,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { Category } from 'src/entities/category';
 import { SubCategory } from 'src/entities/subCategory';
 import { Product } from 'src/entities/product';
+import { View } from 'src/entities/view';
 
 dotenvConfig({ path: '.env' });
 
@@ -14,7 +15,7 @@ const config = {
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  entities: [Category , SubCategory , Product],
+  entities: [Category , SubCategory , Product , View],
   migrations: ['dist/src/migrations/*{.ts,.js}'],
   migrationsTableName: 'migrations',
   autoloadEntities: true,
