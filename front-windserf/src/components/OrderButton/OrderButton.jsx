@@ -1,9 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+/* eslint-disable react/prop-types */
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
-const OrderButton = () => {
+const OrderButton = ({ setDynamicSearchParams }) => {
   const [selectedOption, setSelectedOption] = useState("Ordenar por");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Opciones de ordenamiento
   const options = [
@@ -13,10 +16,17 @@ const OrderButton = () => {
     "Novedades",
   ];
 
+  const updateURLParams = (option) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set("sort", option); // Update "sort" parameter
+    setSearchParams(newSearchParams);
+  };
+
   // Función para seleccionar una opción y cerrar el menú
   const handleOptionClick = (option) => {
     setSelectedOption(option);
     setIsMenuOpen(false); // Cerrar el menú después de seleccionar
+    updateURLParams(option);
   };
 
   useEffect(() => {
@@ -31,6 +41,14 @@ const OrderButton = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [menuRef]);
+
+  useEffect(() => {
+    const newParams = {};
+    searchParams.forEach((value, key) => {
+      newParams[key] = value;
+    });
+    setDynamicSearchParams(newParams);
+  }, [searchParams, setDynamicSearchParams]);
 
   return (
     <div className="relative inline-block text-left" ref={menuRef}>

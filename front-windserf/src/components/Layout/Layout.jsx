@@ -1,16 +1,14 @@
 import React from "react";
 import NavBar from "../NavBar/NavBar";
-import { Outlet, ScrollRestoration } from "react-router-dom";
+import { Outlet, ScrollRestoration } from "react-router-dom"; //analicar tema ScrollRestoration
 import Footer from "../Footer/Footer";
 
 const Layout = () => {
   return (
     <>
       <NavBar />
-      {/*       <ScrollRestoration> */}
       <Outlet />
       <Footer />
-      {/*       </ScrollRestoration> */}
     </>
   );
 };

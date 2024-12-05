@@ -1,19 +1,21 @@
-import foilBg from "../../assets/foil.jpg";
-import windsurfBg from "../../assets/windsurf.jpg";
-import wingFoilBg from "../../assets/wing-foil.jpg";
-import Product from "../../components/Product/Product";
-import instagram from "../../assets/logo-instagram.png";
-import facebook from "../../assets/logo-facebook.png";
-import twitter from "../../assets/logo-twitter.png";
+import { Link } from "react-router-dom";
+import foilBg from "../../../assets/foil.jpg";
+import windsurfBg from "../../../assets/windsurf.jpg";
+import wingFoilBg from "../../../assets/wing-foil.jpg";
+import Product from "../../../components/Product/Product";
+import instagram from "../../../assets/logo-instagram.png";
+import facebook from "../../../assets/logo-facebook.png";
+import twitter from "../../../assets/logo-twitter.png";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCoverflow } from "swiper/modules";
+import { EffectCoverflow, Navigation } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import "swiper/css/effect-coverflow";
-import { Link } from "react-router-dom";
+
+import "./Swiper.css";
 
 const Home = () => {
   return (
@@ -25,17 +27,19 @@ const Home = () => {
           slidesPerView={2}
           spaceBetween={10}
           initialSlide={1}
-          modules={[EffectCoverflow]}
+          modules={[EffectCoverflow, Navigation]}
           effect="coverflow"
           coverflowEffect={{
-            rotate: 30,
-            stretch: 0,
-            depth: 100,
+            rotate: 50,
+            stretch: 65,
+            depth: 860,
+            scale: 1.15,
             modifier: 1,
-            slideShadows: false,
+            slideShadows: true,
           }}
-          className="w-11/12"
+          className="w-full relative z-10"
           style={{ height: "71vh" }}
+          navigation={true}
         >
           <SwiperSlide>
             <div className="w-full h-full relative">

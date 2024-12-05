@@ -10,6 +10,15 @@ export default {
         gray: "#847770",
         beige: "#f3eae8",
       },
+      width: {
+        "30rem": "30rem",
+        "9/40": "22.5%",
+        "21.5%": "21.5%",
+        "1/10": "10%",
+      },
+      minWidth: {
+        "30rem": "30rem",
+      },
     },
     fontFamily: {
       roboto_slab: ["Roboto Slab", "serif"],
