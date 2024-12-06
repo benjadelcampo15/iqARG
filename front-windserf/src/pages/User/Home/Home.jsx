@@ -16,8 +16,20 @@ import "swiper/css/scrollbar";
 import "swiper/css/effect-coverflow";
 
 import "./Swiper.css";
+import { useProducts } from "../../../context/ProductContext";
+import { useEffect, useState } from "react";
 
 const Home = () => {
+  const { products } = useProducts();
+  const [outletProducts, setOutletProducts] = useState([]);
+
+  useEffect(() => {
+    // Filtrar productos de la categoría "Outlet"
+    const filteredProducts = products.filter(
+      (product) => product.category === "Outlet"
+    );
+    setOutletProducts(filteredProducts.slice(0, 8)); // Mostrar los primeros 8 productos
+  }, [products]);
   return (
     <main className="flex flex-col bg-red">
       <section className="flex w-full justify-center pt-4">
@@ -45,7 +57,7 @@ const Home = () => {
             <div className="w-full h-full relative">
               <Link
                 className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-3xl font-semibold opacity-0 hover:opacity-100 transition-opacity duration-300"
-                to="/windsurf"
+                to="/Windsurf"
               >
                 Windsurf
               </Link>
@@ -60,7 +72,7 @@ const Home = () => {
             <div className="w-full h-full relative">
               <Link
                 className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-3xl font-semibold opacity-0 hover:opacity-100 transition-opacity duration-300"
-                to="/foil"
+                to="/Foil"
               >
                 Foil
               </Link>
@@ -75,7 +87,7 @@ const Home = () => {
             <div className="w-full h-full relative">
               <Link
                 className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-3xl font-semibold opacity-0 hover:opacity-100 transition-opacity duration-300"
-                to="/wing-foil"
+                to="/Wing-foil"
               >
                 Wing Foil
               </Link>
@@ -91,18 +103,16 @@ const Home = () => {
       <section className="flex flex-col w-4/5 m-auto mt-14">
         <h2 className="text-brown text-5xl mb-6">Outlet</h2>
         <div className="flex flex-row flex-wrap w-11/12 mx-auto justify-center">
-          <Product />
-          <Product />
-          <Product />
-          <Product />
-          <Product />
-          <Product />
-          <Product />
-          <Product />
+          {outletProducts.map((product) => (
+            <Product key={product.id} product={product} />
+          ))}
         </div>
-        <button className="w-2/12 mt-3 p-2 px-4 self-center bg-lightYellow rounded-3xl text-black hover:bg-darkYellow transition-colors duration-300">
+        <Link
+          to="/Outlet"
+          className="w-2/12 mt-3 p-2 px-4 self-center bg-lightYellow rounded-3xl text-black hover:bg-darkYellow transition-colors duration-300"
+        >
           Ver mas
-        </button>
+        </Link>
       </section>
       <section className="flex flex-col mt-14 items-center">
         <h2 className=" text-brown text-4xl mb-6">Contacto</h2>

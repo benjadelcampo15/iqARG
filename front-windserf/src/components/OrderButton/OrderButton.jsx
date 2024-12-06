@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 
 const OrderButton = ({ setDynamicSearchParams }) => {
   const [selectedOption, setSelectedOption] = useState("Ordenar por");
@@ -8,7 +9,6 @@ const OrderButton = ({ setDynamicSearchParams }) => {
   const menuRef = useRef(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Opciones de ordenamiento
   const options = [
     "Precio: Bajo a Alto",
     "Precio: Alto a Bajo",
@@ -18,14 +18,13 @@ const OrderButton = ({ setDynamicSearchParams }) => {
 
   const updateURLParams = (option) => {
     const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.set("sort", option); // Update "sort" parameter
+    newSearchParams.set("sort", option);
     setSearchParams(newSearchParams);
   };
 
-  // Función para seleccionar una opción y cerrar el menú
   const handleOptionClick = (option) => {
     setSelectedOption(option);
-    setIsMenuOpen(false); // Cerrar el menú después de seleccionar
+    setIsMenuOpen(false);
     updateURLParams(option);
   };
 
@@ -52,23 +51,22 @@ const OrderButton = ({ setDynamicSearchParams }) => {
 
   return (
     <div className="relative inline-block text-left" ref={menuRef}>
-      {/* Botón principal que muestra la opción seleccionada */}
       <button
-        className="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-        onClick={() => setIsMenuOpen(!isMenuOpen)} // Toggle del menú
+        className="inline-flex justify-between items-center w-full rounded-md border border-light-gray shadow-sm px-4 py-2 bg-beige text-sm font-medium text-dark-gray hover:bg-light-gray"
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
-        {selectedOption} {/* Mostrar la opción seleccionada */}
+        {selectedOption}
+        {isMenuOpen ? <FiChevronUp /> : <FiChevronDown />}
       </button>
 
-      {/* Menú desplegable */}
       {isMenuOpen && (
-        <div className="absolute  mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+        <div className="absolute mt-4 w-56 max-w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-transform transform duration-200 ease-in-out">
           <div className="py-1">
             {options.map((option) => (
               <button
                 key={option}
-                onClick={() => handleOptionClick(option)} // Manejar clic en la opción
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => handleOptionClick(option)}
+                className="block w-full text-left px-4 py-2 text-sm text-dark-gray hover:bg-light-gray"
               >
                 {option}
               </button>

@@ -18,6 +18,7 @@ const Products = () => {
   const { products, categories, subcategories } = useProducts();
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [dynamicSearchParams, setDynamicSearchParams] = useState({});
+  const isOutlet = category === "Outlet";
 
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12;
@@ -53,7 +54,11 @@ const Products = () => {
   }, [category, subCategory, categories, subcategories]);
 
   useEffect(() => {
-    setFilteredProducts(filterByCategory(products, category, subCategory));
+    if (isOutlet) {
+      setFilteredProducts(products.filter((product) => product.discount));
+    } else {
+      setFilteredProducts(filterByCategory(products, category, subCategory));
+    }
   }, [category, subCategory, products]);
 
   useEffect(() => {

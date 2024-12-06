@@ -72,10 +72,25 @@ const EditModal = ({
           </div>
         ) : (
           <input
-            type={field === "image" ? "file" : "text"}
+            type={
+              field === "discount"
+                ? "number"
+                : field === "image"
+                ? "file"
+                : "text"
+            }
             className="border border-gray-300 rounded px-3 py-2 w-full mb-4"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) =>
+              setInputValue(
+                field === "discount"
+                  ? parseFloat(e.target.value) || 0
+                  : e.target.value
+              )
+            }
+            placeholder={
+              field === "discount" ? "Ingrese el porcentaje de descuento" : ""
+            }
           />
         )}
         <div className="flex justify-end gap-2">

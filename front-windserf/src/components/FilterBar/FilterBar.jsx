@@ -49,25 +49,29 @@ const FilterBar = ({ filteredProducts, setDynamicSearchParams }) => {
   }, [searchParams, setDynamicSearchParams]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-6 px-4 py-2 bg-beige rounded-lg shadow-md">
+      <h3 className="text-xl font-bold text-darkBrown mb-2">Filtros</h3>
       {filters.map((filter, index) => (
-        <div className="" key={index}>
+        <div key={index} className="flex flex-col gap-3">
           {Object.keys(filter).map((key) => (
-            <div key={key} className="my-3 mx-3">
-              <label htmlFor={key} className="block font-bold text-lg ">
-                {key}
+            <div key={key}>
+              <label
+                htmlFor={key}
+                className="block font-semibold text-lg text-darkBrown mb-1"
+              >
+                {key.charAt(0).toUpperCase() + key.slice(1)}
               </label>
-              {filter[key].map((value, index) => (
-                <button
-                  key={index}
-                  className="border rounded-md px-1 mr-3 my-1"
-                  onClick={() => {
-                    handleFilters(key, value);
-                  }}
-                >
-                  {value}
-                </button>
-              ))}
+              <div className="flex flex-wrap gap-2">
+                {filter[key].map((value, idx) => (
+                  <button
+                    key={idx}
+                    className="px-3 py-1 border border-darkYellow bg-lightYellow rounded-md text-darkBrown hover:bg-darkYellow hover:text-white transition-all duration-200"
+                    onClick={() => handleFilters(key, value)}
+                  >
+                    {value}
+                  </button>
+                ))}
+              </div>
             </div>
           ))}
         </div>

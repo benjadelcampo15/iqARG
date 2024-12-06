@@ -95,10 +95,14 @@ const ProductDetail = () => {
     };
   }, [isMenuOpen]);
 
-  /*   if (loading) return <p>Loading product details...</p>;
-  if (error) return <p>{error}</p>; */
+  const discountedPrice = product.discount
+    ? (product.price * (1 - product.discount / 100)).toFixed(2)
+    : null;
 
   const dynamicProperties = getDynamicProperties(product);
+
+  /*   if (loading) return <p>Loading product details...</p>;
+  if (error) return <p>{error}</p>; */
 
   if (!product) return <p>Product not found.</p>;
 
@@ -138,7 +142,17 @@ const ProductDetail = () => {
                 {product.brand}
               </h4>
               <h2 className="text-4xl font-semibold text-brown mb-8">
-                {`$${product.price}`}
+                {discountedPrice ? (
+                  <div className="flex items-center gap-4">
+                    {/* Precio original tachado */}
+                    <span className="text-2xl text-gray-400 line-through">{`$${product.price}`}</span>
+                    {/* Precio con descuento */}
+                    <span className="text-4xl text-green-500">{`$${discountedPrice}`}</span>
+                  </div>
+                ) : (
+                  // Precio normal
+                  `$${product.price}`
+                )}
               </h2>
               {Object.keys(dynamicProperties).map((property, index) => (
                 <div key={index}>
@@ -184,24 +198,7 @@ const ProductDetail = () => {
               </button>
               <div className="w-2/3">
                 <h2 className="text-2xl font-semibold">Descripcion</h2>
-                <p>
-                  Fanatic Mamba TE 2023 reemplaza la mítica tabla de olas Stubby
-                  en nuestra gama. Recoge todas las cualidades de la stubby en
-                  olas mediocres, pero es mucho más eficiente cuando las
-                  condiciones mejoran. La Mamba es la evolución de nuestra gama
-                  Stubby, de la cual nuestro equipo de I + D ha evolucionado
-                  constantemente el contorno original hacia un perfil cada vez
-                  más paralelo y secciones delanteras / traseras más escondidas.
-                  El resultado es un nuevo aspecto y una gama de uso aún más
-                  amplia. Las principales características de la Stubby se
-                  combinan con una cola más estrecha y un nose más delgado, lo
-                  que mejora la estética de la tabla pero lo más importante te
-                  permite ajustar tus cambios de dirección y tu capacidad de
-                  respuesta de conducción más rápidamente cuando las olas
-                  mejoran. Con su rápido planeo, gran maniobrabilidad en el
-                  chopy, no tienes que ser un pro para hacer reventar todas las
-                  olas con la Mamba.
-                </p>
+                <p>{product.description}</p>
               </div>
             </div>
           </div>

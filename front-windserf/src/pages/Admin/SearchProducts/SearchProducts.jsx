@@ -86,6 +86,12 @@ const SearchProducts = () => {
                 >
                   {`$${productSearch.price}`}
                 </h2>
+                <h3
+                  onClick={() => openModal("discount")}
+                  className="text-2xl font-semibold text-green-500 mb-5 cursor-pointer"
+                >
+                  {`Descuento: ${productSearch.discount || 0}%`}
+                </h3>
                 {Object.keys(dynamicProperties).map((property, index) => (
                   <div
                     key={index}
@@ -117,7 +123,12 @@ const SearchProducts = () => {
             </div>
           </section>
         )}
-        <button onClick={handleSubmit}></button>
+        <button
+          className="mt-5 px-4 py-2 bg-blue-500 text-white rounded"
+          onClick={handleSubmit}
+        >
+          Guardar cambios
+        </button>
       </section>
       <EditModal
         isOpen={isModalOpen}
