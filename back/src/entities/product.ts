@@ -15,11 +15,17 @@ export class Product {
   @Column({ nullable: false })
   price: number;
 
+  @Column({nullable: true})
+  discount: number;
+
   @Column({ nullable: true })
   stock: number;
 
   @Column({ nullable: false })
   brand: string;
+
+  @Column({nullable: false})
+  description: string;
 
   // Actualiza los arrays para que usen "text[]" en PostgreSQL
   @Column('text', { array: true, nullable: true })

@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { subCategoriesDto } from 'src/dtos/subCategory.dto';
 import { Category } from 'src/entities/category';
 import { SubCategory } from 'src/entities/subCategory';
 import { subCategories } from 'src/utils/subCategories';
@@ -38,6 +39,16 @@ export class subCategoryService implements OnModuleInit {
 
     async getAll(): Promise<SubCategory[]> {
       return await this.subCategoryRepository.find({relations: ["category"]});
+    }
+
+    async createSubCategory(subCategory: subCategoriesDto): Promise<SubCategory> {
+      const newSubCategory = await this.subCategoryRepository.create(subCategory);
+      return await this.subCategoryRepository.save(newSubCategory);
+    }
+  
+    async deleteSubCategory(id: string): Promise<string> {
+      await this.subCategoryRepository.delete(id);
+      return `Subcategory with ID ${id} has been deleted successfully.`;
     }
   }
 
