@@ -20,16 +20,17 @@ export class CategoryService implements OnModuleInit {
         this.categoryRepository.save(category);
       });
     }
-
-    
   }
 
   async getAll(): Promise<Category[]> {
-    return await this.categoryRepository.find({relations: ["subCategories"]});
+    return await this.categoryRepository.find({ relations: ['subCategories'] });
   }
 
   async getCategoryById(id: string): Promise<Category> {
-    return await this.categoryRepository.findOne({ where: { id }, relations: ["subCategories"] });
+    return await this.categoryRepository.findOne({
+      where: { id },
+      relations: ['subCategories'],
+    });
   }
 
   async createCategory(category: CategoryDto): Promise<Category> {

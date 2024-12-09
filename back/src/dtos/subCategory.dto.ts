@@ -1,4 +1,4 @@
 export class subCategoriesDto {
-    name: string;
-    category: string;
+  name: string;
+  category: string;
 }

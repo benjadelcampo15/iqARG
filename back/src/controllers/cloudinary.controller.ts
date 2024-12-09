@@ -11,7 +11,6 @@
 //     UseInterceptors,
 //   } from '@nestjs/common';
 // import { CloudinaryService } from 'src/services/cloudinary.service';
-  
 
 //   @Controller('files')
 //   export class CloudinaryController {
@@ -19,7 +18,7 @@
 //       private readonly cloudinaryService: CloudinaryService,
 //       private readonly productService: productsService,
 //     ) {}
-  
+
 //     @Post("uploadImage/:id")
 //     @UseInterceptors(FileInterceptor("file"))
 //     async uploadImage(
@@ -38,9 +37,9 @@
 //       file: Express.Multer.File,
 //     ) {
 //       await this.productService.getProductById(id);
-  
+
 //       const img = await this.cloudinaryService.uploadImage(file);
-      
+
 //       return this.productService.updateProduct(id, {
 //         imgUrl: img.url,
 //       });

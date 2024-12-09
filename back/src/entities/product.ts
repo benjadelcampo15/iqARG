@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { Category } from './category';
 import { SubCategory } from './subCategory';
@@ -15,7 +21,7 @@ export class Product {
   @Column({ nullable: false })
   price: number;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   discount: number;
 
   @Column({ nullable: true })
@@ -24,7 +30,7 @@ export class Product {
   @Column({ nullable: false })
   brand: string;
 
-  @Column({nullable: false})
+  @Column({ nullable: false })
   description: string;
 
   // Actualiza los arrays para que usen "text[]" en PostgreSQL
