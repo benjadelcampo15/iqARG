@@ -14,11 +14,11 @@ const Product = ({ product }) => {
       rounded-lg shadow-md hover:bg-slate-50 transition-colors duration-300"
     >
       <div className="w-4/5">
-        <img src={product.image} alt={product.name} />
+        <img src={product.img} alt={product.name} />
       </div>
       <div className="flex flex-col items-center my-2 mx-1">
         <h3 className="text-opacity-50 opacity-50 pb-1">
-          {product.subCategory}
+          {product.subCategory.name}
         </h3>
         <h3 className="text-lg font-semibold mb-5 text-center">
           {product.name}

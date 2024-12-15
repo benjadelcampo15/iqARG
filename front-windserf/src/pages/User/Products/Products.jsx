@@ -6,6 +6,7 @@ import Product from "./../../../components/Product/Product";
 import Pagination from "../../../components/Pagination/Pagination";
 import NotFoundPage from "../../../components/NotFoundPage/NotFoundPage";
 import { useProducts } from "../../../context/ProductContext";
+import Loading from "./../../../components/Loading/Loading";
 import {
   filterByCategory,
   filterByQuerys,
@@ -15,33 +16,35 @@ import {
 const Products = () => {
   const [validUrl, setValidUrl] = useState(null);
   const { category, subCategory } = useParams();
-  const { products, categories, subcategories } = useProducts();
+  const { products, categories, subCategories, loading, error } = useProducts();
+
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [dynamicSearchParams, setDynamicSearchParams] = useState({});
+  console.log("DynaimcSearchParams: ", dynamicSearchParams);
+
   const isOutlet = category === "Outlet";
 
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12;
 
-  const totalPages = Math.ceil(products.length / productsPerPage);
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts =
-    filteredProducts &&
-    filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-
   useEffect(() => {
+    let categoryFormated = category.replace("-", " ");
+
     if (
+      categories.length > 0 &&
       categories
         .map((cat) => cat.name)
-        .includes(category.charAt(0).toUpperCase() + category.slice(1))
+        .includes(
+          categoryFormated.charAt(0).toUpperCase() + categoryFormated.slice(1)
+        )
     ) {
       if (
-        subcategories
-          .map((subca) => subca.name)
-          .includes(
-            subCategory.charAt(0).toUpperCase() + subCategory.slice(1)
-          ) ||
+        (subCategory &&
+          subCategories
+            .map((subca) => subca.name)
+            .includes(
+              subCategory.charAt(0).toUpperCase() + subCategory.slice(1)
+            )) ||
         subCategory === undefined
       ) {
         setValidUrl(true);
@@ -51,9 +54,35 @@ const Products = () => {
     } else {
       setValidUrl(false);
     }
-  }, [category, subCategory, categories, subcategories]);
+  }, [category, subCategory, categories, subCategories]);
 
   useEffect(() => {
+    let productsToFilter = products;
+
+    if (isOutlet) {
+      productsToFilter = productsToFilter.filter((product) => product.discount);
+    } else {
+      productsToFilter = filterByCategory(
+        productsToFilter,
+        category,
+        subCategory
+      );
+    }
+
+    /* const dynamicSearchParamsWithoutIndex = dynamicSearchParams. */
+    productsToFilter = filterByQuerys(productsToFilter, dynamicSearchParams);
+
+    if (dynamicSearchParams.sort) {
+      productsToFilter = sortProducts(
+        productsToFilter,
+        dynamicSearchParams.sort
+      );
+    }
+
+    setFilteredProducts(productsToFilter);
+  }, [products, category, subCategory, dynamicSearchParams, isOutlet]);
+
+  /*   useEffect(() => {
     if (isOutlet) {
       setFilteredProducts(products.filter((product) => product.discount));
     } else {
@@ -65,34 +94,48 @@ const Products = () => {
     setFilteredProducts((prevFilteredProducts) =>
       filterByQuerys(prevFilteredProducts, dynamicSearchParams)
     );
-    if (Object.keys(dynamicSearchParams).includes("sort")) {
+
+    if (dynamicSearchParams.sort) {
       setFilteredProducts((prevFilteredProducts) =>
         sortProducts(prevFilteredProducts, dynamicSearchParams.sort)
       );
     }
-  }, [dynamicSearchParams]);
+  }, [dynamicSearchParams]); */
 
   function onPageChange(newPage) {
     setCurrentPage(newPage);
   }
 
+  const totalPages = Math.ceil(products.length / productsPerPage);
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts =
+    filteredProducts &&
+    filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  if (!products || products.length === 0) {
+    return <Loading message="Cargando productos..." />;
+  }
   if (!validUrl) return <NotFoundPage />;
 
   return (
-    <main className="flex flex-row ">
-      <div className="flex flex-col w-1/10 pl-4 pr-1 py-1 mr-8 bg-beige">
+    <main className="flex flex-row gap-6 px-6 py-4">
+      {/* Sidebar */}
+      <aside className="flex flex-col w-1/5 bg-beige rounded-lg p-4 shadow-md">
         <OrderButton setDynamicSearchParams={setDynamicSearchParams} />
         <FilterBar
           filteredProducts={filteredProducts}
           setDynamicSearchParams={setDynamicSearchParams}
         />
-      </div>
-      <section className="flex flex-col items-center w-5/6 mt-2 mx-auto">
-        <div className="flex flex-row items-center justify-center">
-          <Link to="/" className="text-xl">
+      </aside>
+
+      {/* Main content */}
+      <section className="flex flex-col items-center w-4/5">
+        <div className="flex flex-row items-center justify-center gap-2 mb-4">
+          <Link to="/" className="text-xl text-darkBrown hover:underline">
             Home
           </Link>
-          <p className="text-xl mx-1 pointer-events-none">{">"}</p>
+          <p className="text-xl text-darkBrown">{">"}</p>
           <Link
             className={`text-xl capitalize ${
               !subCategory ? "pointer-events-none cursor-not-allowed" : ""
@@ -100,22 +143,20 @@ const Products = () => {
           >
             {category}
           </Link>
-          {subCategory ? (
-            <p className="text-xl mx-1 pointer-events-none">{">"}</p>
-          ) : null}
-          {subCategory ? (
-            <p className="text-xl capitalize pointer-events-none">
-              {subCategory}
-            </p>
-          ) : null}
+          {subCategory && (
+            <>
+              <p className="text-xl text-darkBrown">{">"}</p>
+              <p className="text-xl capitalize">{subCategory}</p>
+            </>
+          )}
         </div>
-        <div className="flex  justify-center w-full">
-          <div className="flex flex-wrap mt-5 w-11/12 gap-x-8">
-            {currentProducts.map((product) => (
-              <Product key={product.id} product={product} />
-            ))}
-          </div>
+
+        <div className="flex flex-wrap justify-center gap-6 w-full">
+          {currentProducts.map((product) => (
+            <Product key={product.id} product={product} />
+          ))}
         </div>
+
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

@@ -20,26 +20,36 @@ export const ProductProvider = ({ children }) => {
     setLoading(true);
     setError(false);
     try {
-      const response = "";
-      const data = response.json;
+      const response = await axios.get("http://localhost:3000/products");
+      const data = response.data;
       setProducts(data);
     } catch (err) {
       setError("No se encontraron productos");
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
   }, []);
 
   const fetchCategories = useCallback(async () => {
+    setLoading(true);
+    setError(false);
     try {
-      const responseCategories = "";
-      const responseSubCategories = "";
-      const categories = responseCategories.json;
-      const subCategories = responseSubCategories.json;
+      const responseCategories = await axios.get(
+        "http://localhost:3000/categories"
+      );
+
+      const responseSubCategories = await axios.get(
+        "http://localhost:3000/subcategories"
+      );
+      const categories = responseCategories.data;
+
+      const subCategories = responseSubCategories.data;
       setCategories(categories);
       setSubCategories(subCategories);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   }, []);
 

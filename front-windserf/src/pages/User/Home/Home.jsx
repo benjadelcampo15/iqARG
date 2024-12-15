@@ -26,7 +26,7 @@ const Home = () => {
   useEffect(() => {
     // Filtrar productos de la categoría "Outlet"
     const filteredProducts = products.filter(
-      (product) => product.category === "Outlet"
+      (product) => product.discount !== null
     );
     setOutletProducts(filteredProducts.slice(0, 8)); // Mostrar los primeros 8 productos
   }, [products]);
@@ -109,7 +109,7 @@ const Home = () => {
         </div>
         <Link
           to="/Outlet"
-          className="w-2/12 mt-3 p-2 px-4 self-center bg-lightYellow rounded-3xl text-black hover:bg-darkYellow transition-colors duration-300"
+          className="w-2/12 mt-3 p-2 px-4 self-center text-center bg-lightYellow rounded-3xl text-black hover:bg-darkYellow transition-colors duration-300"
         >
           Ver mas
         </Link>

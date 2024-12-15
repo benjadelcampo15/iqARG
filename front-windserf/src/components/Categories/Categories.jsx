@@ -12,7 +12,7 @@ const Categories = () => {
           </Link>
           <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-transform duration-300 ease-out scale-y-0 origin-top group-hover:scale-y-100">
             <div className="py-1">
-              {category.subcategories.map((subcategory) => (
+              {category.subCategories.map((subcategory) => (
                 <Link
                   key={subcategory.name}
                   to={`/${category.name}/${subcategory.name}`}

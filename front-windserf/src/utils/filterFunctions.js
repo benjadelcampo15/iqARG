@@ -19,20 +19,51 @@ export const sortProducts = (products, option) => {
 
 export const filterByCategory = (products, category, subCategory) => {
   return products.filter((product) => {
+    const productCategory = product.category.name.replace(" ", "-");
+
     if (subCategory) {
       return (
-        product.category === category && product.subCategory === subCategory
+        productCategory === category && product.subCategory.name === subCategory
       );
     } else {
-      return product.category === category;
+      return productCategory === category;
     }
   });
 };
 
-export const filterByQuerys = (filteredProducts, dynamicSearchParams) => {
-  return filteredProducts.filter((product) => {
-    return Object.entries(dynamicSearchParams).every(([key, value]) => {
-      return !value || product[key] === value || product[key].includes(value);
+export const filterByQuerys = (products, queryParams) => {
+  return products.filter((product) => {
+    return Object.keys(queryParams).every((key) => {
+      if (!queryParams[key].length) return true;
+
+      const productValue = Array.isArray(product[key])
+        ? product[key].map((v) => v.toLowerCase())
+        : product[key]?.toLowerCase();
+      const filterValues = queryParams[key].map((v) => v.toLowerCase());
+
+      if (Array.isArray(productValue)) {
+        return filterValues.some((value) => productValue.includes(value));
+      }
+      return filterValues.includes(productValue);
     });
   });
+};
+
+export const updateSearchParams = (filterKey, filterValue) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentValues = urlParams.get(filterKey)?.split(",") || [];
+
+  if (currentValues.includes(filterValue)) {
+    const updatedValues = currentValues.filter(
+      (value) => value !== filterValue
+    );
+    updatedValues.length
+      ? urlParams.set(filterKey, updatedValues.join(","))
+      : urlParams.delete(filterKey);
+  } else {
+    currentValues.push(filterValue);
+    urlParams.set(filterKey, currentValues.join(","));
+  }
+
+  window.history.replaceState(null, "", "?" + urlParams.toString());
 };
