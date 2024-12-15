@@ -23,7 +23,6 @@ export class ProductService implements OnModuleInit {
 
   async onModuleInit() {
     const exists = await this.productRepository.find();
-
     const existsCat = await this.subCategoryRepository.find();
 
     console.log(
@@ -34,33 +33,37 @@ export class ProductService implements OnModuleInit {
       }),
     );
 
-    const category = await this.categoryRepository.findOne({
-      where: { name: products[0].category },
-    });
-    if (existsCat.length != 0) {
-      if (exists.length === 0) {
-        for (const product of products) {
-          const subCategory = await this.subCategoryRepository.findOne({
-            where: { name: product.subCategory },
-          });
+    if (existsCat.length !== 0 && exists.length === 0) {
+      for (const product of products) {
+        // Buscar la categoría correspondiente al producto
+        const category = await this.categoryRepository.findOne({
+          where: { name: product.category },
+        });
 
-          await this.productRepository.save({
-            name: product.name,
-            price: product.price,
-            stock: product.stock,
-            description: product.description,
-            brand: product.brand,
-            color: product.color,
-            material: product.material,
-            size: product.size,
-            measurement: product.measurement,
-            subCategory: subCategory,
-            category: category,
-          });
-        }
+        // Buscar la subcategoría correspondiente al producto
+        const subCategory = await this.subCategoryRepository.findOne({
+          where: { name: product.subCategory },
+        });
+
+        // Guardar el producto con su propia categoría y subcategoría
+        await this.productRepository.save({
+          name: product.name,
+          price: product.price,
+          stock: product.stock,
+          description: product.description,
+          brand: product.brand,
+          color: product.color,
+          material: product.material,
+          size: product.size,
+          measurement: product.measurement,
+          subCategory: subCategory,
+          category: category,
+          discount: product.discount,
+        });
       }
     }
   }
+
   async getAll(): Promise<any[]> {
     // Obtener los productos con sus relaciones
     const products = await this.productRepository.find({
@@ -114,6 +117,7 @@ export class ProductService implements OnModuleInit {
         measurement: product.measurement,
         subCategory: subCategory,
         category: category,
+        discount: product.discount,
       });
 
       const newProduct = await this.productRepository.findOne({

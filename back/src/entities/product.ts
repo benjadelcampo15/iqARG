@@ -48,7 +48,8 @@ export class Product {
 
   @Column({
     default:
-      'https://res-console.cloudinary.com/dfdjvas05/thumbnails/v1/image/upload/v1725463908/aW1hZ2UtaWNvbi10cmVuZHktZmxhdC1zdHlsZS02MDBudy02NDMwODA4OTVfcHZjY2Jl/drilldown',
+      //'https://res-console.cloudinary.com/dfdjvas05/thumbnails/v1/image/upload/v1725463908/aW1hZ2UtaWNvbi10cmVuZHktZmxhdC1zdHlsZS02MDBudy02NDMwODA4OTVfcHZjY2Jl/drilldown',
+      'https://acdn.mitiendanube.com/stores/001/102/572/products/producto-tn-5-0f2c77b4c638fec31017256298586857-1024-1024.webp',
   })
   img: string;
 
