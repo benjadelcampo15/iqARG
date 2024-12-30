@@ -10,6 +10,7 @@ export class ProductDto {
   material: string[];
   size: string[];
   measurement: string[];
+  img?: string;
   views: number;
   category: string;
 }
