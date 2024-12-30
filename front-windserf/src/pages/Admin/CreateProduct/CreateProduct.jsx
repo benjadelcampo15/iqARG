@@ -9,7 +9,7 @@ const CreateProduct = () => {
     price: 0,
     stock: 0,
     description: "",
-    image: null,
+    img: null,
     category: "",
     subCategory: "",
   });
@@ -22,7 +22,7 @@ const CreateProduct = () => {
   };
 
   const handleImageUpload = (e) => {
-    setFormData({ ...formData, image: e.target.files[0] });
+    setFormData({ ...formData, img: e.target.files[0].name });
   };
 
   const handleCategoryChange = (categoryName) => {
