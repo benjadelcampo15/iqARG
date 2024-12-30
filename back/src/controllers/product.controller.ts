@@ -28,6 +28,8 @@ export class ProductController {
 
   @Post()
   async addProduct(@Body() product: ProductDto): Promise<Product> {
+    console.log(product);
+
     return await this.productService.addProduct(product);
   }
 

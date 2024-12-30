@@ -87,6 +87,8 @@ export class ProductService implements OnModuleInit {
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
+    console.log(product);
+
     return product;
   }
 
@@ -125,6 +127,7 @@ export class ProductService implements OnModuleInit {
         relations: ['subCategory', 'subCategory.category'],
       });
 
+      console.log(newProduct);
       return newProduct;
     } catch (error) {
       throw new Error(`Failed to add product: ${error.message}`);
@@ -140,6 +143,8 @@ export class ProductService implements OnModuleInit {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
 
+    delete product.views;
+
     // Actualizar el producto
     await this.productRepository.update(id, product);
 
@@ -153,6 +158,8 @@ export class ProductService implements OnModuleInit {
         `Failed to retrieve updated product with ID ${id}`,
       );
     }
+
+    console.log(updatedProduct);
 
     return updatedProduct;
   }

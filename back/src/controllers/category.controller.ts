@@ -12,12 +12,13 @@ export class CategoryController {
   }
 
   @Post()
-  createCategory(@Body() category: CategoryDto) {
-    return this.categoryService.createCategory(category);
+  async createCategory(@Body() category: CategoryDto) {
+    return await this.categoryService.createCategory(category);
   }
 
   @Delete(':id')
-  deleteCategory(@Param('id') id: string) {
-    return this.categoryService.deleteCategory(id);
+  async deleteCategory(@Param('id') id: string): Promise<{ message: string }> {
+    await this.categoryService.deleteCategory(id);
+    return { message: 'Category deleted successfully.' };
   }
 }

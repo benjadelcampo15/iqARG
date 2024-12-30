@@ -11,7 +11,10 @@ export class Category {
   @Column({ length: 50 })
   name: string;
 
-  @OneToMany(() => SubCategory, (subCategory) => subCategory.category)
+  @OneToMany(() => SubCategory, (subCategory) => subCategory.category, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   subCategories: SubCategory[];
 
   @OneToMany(() => Product, (product) => product.category)

@@ -53,10 +53,22 @@ export class Product {
   })
   img: string;
 
-  @ManyToOne(() => SubCategory, (subCategory) => subCategory.products)
+  @Column({
+    default: new Date().toLocaleString('es-AR', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+      hour12: false,
+    }),
+  })
+  published: Date;
+
+  @ManyToOne(() => SubCategory, (subCategory) => subCategory.products, {
+    onDelete: 'CASCADE',
+  })
   subCategory: SubCategory;
 
-  @ManyToOne(() => Category, (category) => category.products)
+  @ManyToOne(() => Category, (category) => category.products, {
+    onDelete: 'CASCADE',
+  })
   category: Category;
 
   @OneToMany(() => View, (view) => view.product)
