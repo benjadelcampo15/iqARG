@@ -87,7 +87,7 @@ const Home = () => {
             <div className="w-full h-full relative">
               <Link
                 className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-3xl font-semibold opacity-0 hover:opacity-100 transition-opacity duration-300"
-                to="/Wing-foil"
+                to="/Wing foil"
               >
                 Wing Foil
               </Link>

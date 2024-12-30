@@ -4,12 +4,13 @@ import Product from "../../../components/Product/Product";
 
 const RelatedProducts = ({ category, subCategory }) => {
   const { products } = useProducts();
-  const relatedProducts = products
-    .filter(
-      (product) =>
-        product.category === category && product.subCategory === subCategory
-    )
-    .slice(0, 5);
+
+  const relatedProducts = products.filter(
+    (product) =>
+      product.category.name === category.name &&
+      product.subCategory.name === subCategory.name
+  );
+
   return (
     <section className="mt-12">
       <h2 className="mb-3 text-3xl font-medium self-center justify-self-center">
@@ -17,20 +18,8 @@ const RelatedProducts = ({ category, subCategory }) => {
       </h2>
       <div className="flex">
         {relatedProducts.map((product) => (
-          <Product
-            key={product.id}
-            id={product.id}
-            image={product.image}
-            name={product.name}
-            subCategory={product.subCategory}
-            price={product.price}
-          />
+          <Product key={product.id} product={product} />
         ))}
-        {/*         <Product />
-        <Product />
-        <Product />
-        <Product />
-        <Product /> */}
       </div>
     </section>
   );

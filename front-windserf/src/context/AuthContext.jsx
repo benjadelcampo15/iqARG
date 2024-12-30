@@ -1,41 +1,43 @@
+import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const login = async (username, password) => {
     try {
-      const response = await fetch("https://tu-backend.com/api/login", {
-        //Cambiar esto por la url real
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
+      const response = await axios.post("http://localhost:3000/admin/login", {
+        username,
+        password,
       });
-      /* const response = { ok: true }; */ //Esto hay que borrar
+      console.log(response);
 
-      if (response.ok) {
-        const data = response.json();
-        const { token } = data;
+      if (response) {
+        const { token } = response.data;
+        console.log(token);
         localStorage.setItem("authToken", token);
         setIsAuthenticated(true);
-        return true;
+        return navigate("/admin/dashboard");
       } else {
         const errorData = await response.json();
+        console.log(errorData);
         console.error("Error al iniciar sesión:", errorData.message);
+        alert("Credenciales incorrectas");
         return false;
       }
     } catch (error) {
-      console.error("Error al conectar con el servidor:", error);
+      console.log("Error al conectar con el servidor:", error);
+      alert("Credenciales incorrectas");
       return false;
     }
   };
 
-  const logout = () => {
+  const logOut = () => {
     setIsAuthenticated(false);
     localStorage.removeItem("authToken");
   };
@@ -46,25 +48,29 @@ export const AuthProvider = ({ children }) => {
 
       if (token) {
         try {
-          const response = await fetch(
-            "https://tu-backend.com/api/verify-token",
+          const response = await axios.post(
+            "http://localhost:3000/admin/verify-token",
+            {},
             {
-              method: "POST",
               headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`, // Enviar el token en el header
+                Authorization: `Bearer ${token}`,
               },
             }
           );
 
-          if (response.ok) {
+          if (response.data.valid) {
+            console.log("Token is valid");
             setIsAuthenticated(true);
           } else {
-            logout();
+            console.warn("Token is invalid");
+            logOut();
           }
         } catch (error) {
-          console.error("Error al verificar el token:", error);
-          logout();
+          console.error(
+            "Error al verificar el token:",
+            error.response?.data || error.message
+          );
+          logOut();
         }
       }
       setLoading(false);
@@ -78,7 +84,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logOut }}>
       {children}
     </AuthContext.Provider>
   );

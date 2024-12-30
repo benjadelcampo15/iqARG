@@ -50,7 +50,7 @@ const OrderButton = ({ setDynamicSearchParams }) => {
   }, [searchParams, setDynamicSearchParams]);
 
   return (
-    <div className="relative inline-block text-left" ref={menuRef}>
+    <div className="relative inline-block text-left mb-4" ref={menuRef}>
       <button
         className="inline-flex justify-between items-center w-full rounded-md border border-light-gray shadow-sm px-4 py-2 bg-beige text-sm font-medium text-dark-gray hover:bg-light-gray"
         onClick={() => setIsMenuOpen(!isMenuOpen)}

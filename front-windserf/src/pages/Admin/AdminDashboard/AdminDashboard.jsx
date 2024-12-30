@@ -1,7 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 const AdminDashboard = () => {
+  const { logOut } = useAuth();
+  const logOutHandler = () => {
+    logOut();
+  };
   return (
     <section className="mt-32 flex flex-col items-center gap-4">
       <Link
@@ -22,6 +27,12 @@ const AdminDashboard = () => {
       >
         Categories
       </Link>
+      <button
+        className="mt-20 px-14 py-3 bg-slate-700 text-white font-semibold rounded-md hover:bg-slate-800 text-xl"
+        onClick={logOutHandler}
+      >
+        Log Out
+      </button>
     </section>
   );
 };

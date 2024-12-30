@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
@@ -45,15 +45,11 @@ const FilterBar = ({ filteredProducts, setDynamicSearchParams }) => {
       values: Array.from(value), // Convierte el Set a un array
     }));
 
-    console.log("Filtros generados:", filtersArray);
     return filtersArray;
   };
 
   const handleFilters = (filterKey, filterValue) => {
     filterValue = Array.isArray(filterValue) ? filterValue[0] : filterValue;
-    console.log("Search Params desde FilterBar: ", searchParams);
-    console.log("FilterKey: ", filterKey);
-    console.log("FilterValue: ", filterValue);
 
     const url = new URL(window.location.href);
     const newSearchParams = new URLSearchParams(url.search);
@@ -61,9 +57,6 @@ const FilterBar = ({ filteredProducts, setDynamicSearchParams }) => {
     const currentValues = searchParams.get(filterKey)?.split(",") || [];
 
     console.log("NewSearchParams: ", newSearchParams);
-    console.log("SearchParams: ", searchParams);
-
-    console.log("Current Values Before Modification:", currentValues);
 
     if (currentValues.includes(filterValue)) {
       //Eliminar el valor si esta seleccionado
@@ -76,22 +69,27 @@ const FilterBar = ({ filteredProducts, setDynamicSearchParams }) => {
     } else {
       newSearchParams.append(filterKey, filterValue);
       setActiveFilters([...activeFilters, filterKey, filterValue]);
-      console.log([...activeFilters, filterKey, filterValue]);
     }
 
-    console.log("New Search Params:", newSearchParams.toString());
     setSearchParams(newSearchParams); // Actualizar los parámetros de búsqueda
   };
 
-  useEffect(() => {
+  const setFiltersOnce = useCallback(() => {
     setFilters(createFiltersArray(filteredProducts));
-  }, [filteredProducts]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setFiltersOnce();
+  }, [setFiltersOnce]);
 
   useEffect(() => {
     const url = new URL(window.location.href);
     const params = new URLSearchParams(url.search);
     const resultArray = [];
     params.forEach((value, key) => {
+      console.log(key);
+
       resultArray.push(key, value);
     });
     setActiveFilters(resultArray);
@@ -102,8 +100,6 @@ const FilterBar = ({ filteredProducts, setDynamicSearchParams }) => {
     searchParams.forEach((value, key) => {
       newParams[key] = value.split(","); // Convierte a array
     });
-
-    console.log("NewParams: ", newParams);
 
     setDynamicSearchParams(newParams);
   }, [searchParams, setDynamicSearchParams]);
@@ -124,12 +120,6 @@ const FilterBar = ({ filteredProducts, setDynamicSearchParams }) => {
           <div className="flex flex-wrap gap-2">
             {filter.values.map((value, idx) => {
               const isActive = activeFilters.includes(value);
-              if (isActive) {
-                console.log(activeFilters);
-                console.log(value);
-                console.log(filter.key);
-              }
-
               const shouldHide =
                 activeFilters.includes(filter.key) && !isActive;
 

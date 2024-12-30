@@ -15,6 +15,7 @@ export const ProductProvider = ({ children }) => {
   const [subCategories, setSubCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [triggerFetch, setTriggerFetch] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -53,15 +54,45 @@ export const ProductProvider = ({ children }) => {
     }
   }, []);
 
-  const postProduct = (product) => {};
+  const postProduct = async (product) => {
+    const result = await axios.post("http://localhost:3000/products", product);
+    setTriggerFetch((prev) => !prev);
+    if (result) {
+      alert("Producto creado correctamente");
+    }
+  };
 
-  const updateProduct = (id, product) => {};
+  const updateProduct = async (id, product) => {
+    await axios.put(`http://localhost:3000/products/${id}`, product);
+    setTriggerFetch((prev) => !prev);
+  };
 
-  const postCategory = (category) => {};
+  const deleteProduct = async (id) => {
+    await axios.delete(`http://localhost:3000/products/${id}`);
+  };
 
-  const postSubCategory = (category, subCategory) => {};
+  const postCategory = async (category) => {
+    await axios.post("http://localhost:3000/categories", { name: category });
+    setTriggerFetch((prev) => !prev);
+  };
 
-  const deleteSubCategory = (subCategory) => {};
+  const deleteCategory = async (category) => {
+    await axios.delete(`http://localhost:3000/categories/${category}`);
+    setTriggerFetch((prev) => !prev);
+  };
+
+  const postSubCategory = async (category, subCategory) => {
+    await axios.post("http://localhost:3000/subcategories", {
+      name: subCategory,
+      category: category,
+    });
+    setTriggerFetch((prev) => !prev);
+  };
+
+  const deleteSubCategory = async (subCategory) => {
+    await axios.delete(`http://localhost:3000/subcategories/${subCategory}`);
+    setTriggerFetch((prev) => !prev);
+  };
 
   const addView = (productId, userId) => {
     /* axios.put("..../products/" + productId + "/view", { productId, userId }); */
@@ -69,11 +100,11 @@ export const ProductProvider = ({ children }) => {
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
+  }, [fetchProducts, triggerFetch]);
 
   useEffect(() => {
     fetchCategories();
-  }, [fetchCategories]);
+  }, [fetchCategories, triggerFetch]);
 
   return (
     <ProductContext.Provider
@@ -85,7 +116,9 @@ export const ProductProvider = ({ children }) => {
         subCategories,
         postProduct,
         updateProduct,
+        deleteProduct,
         postCategory,
+        deleteCategory,
         postSubCategory,
         deleteSubCategory,
         addView,

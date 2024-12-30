@@ -26,11 +26,11 @@ const CreateProduct = () => {
   };
 
   const handleCategoryChange = (categoryName) => {
-    setFormData({ ...formData, category: categoryName, subcategory: "" });
+    setFormData({ ...formData, category: categoryName, subCategory: "" });
   };
 
   const handleSubcategoryChange = (subcategoryName) => {
-    setFormData({ ...formData, subcategory: subcategoryName });
+    setFormData({ ...formData, subCategory: subcategoryName });
   };
 
   // Agrega una opción a una característica específica
@@ -48,8 +48,8 @@ const CreateProduct = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    postProduct(formData);
     console.log("Datos del producto:", formData);
+    postProduct(formData);
   };
 
   return (
@@ -78,13 +78,15 @@ const CreateProduct = () => {
         <div className="mb-4">
           <label className="block text-sm font-medium">Subcategoría</label>
           <select
-            value={formData.subcategory}
+            value={formData.subCategory}
             onChange={(e) => handleSubcategoryChange(e.target.value)}
             className="border p-2 w-full"
             required
           >
             <option value="" disabled>
-              Seleccionar subcategoría
+              {formData.subCategory
+                ? formData.subCategory
+                : "Seleccionar subcategoría"}
             </option>
             {categories
               .find((category) => category.name === formData.category)

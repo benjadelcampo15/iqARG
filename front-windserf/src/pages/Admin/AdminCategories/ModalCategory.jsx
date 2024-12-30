@@ -1,54 +1,85 @@
 /* eslint-disable react/prop-types */
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useProducts } from "../../../context/ProductContext";
 
-const ModalCategory = ({ category, subCategories, setSubCategories }) => {
-  const { postSubCategory, deleteSubCategory } = useProducts();
+const ModalCategory = ({
+  isOpen,
+  onClose,
+  category,
+  /* subCategories */
+  setSubCategories,
+}) => {
+  const { subCategories, postSubCategory, deleteSubCategory } = useProducts();
+  const [filteredSubCategories, setFilteredSubCategories] = useState([]);
   const [newSubCategory, setNewSubCategory] = useState("");
+
+  useEffect(() => {
+    setFilteredSubCategories(
+      subCategories.filter((subCategory) => {
+        return subCategory.category.name === category;
+      })
+    );
+  }, [category, subCategories]);
 
   const handleDeleteSubCategory = (id) => {
     deleteSubCategory(id);
-    setSubCategories(
-      subCategories.filter((subCategory) => {
-        return subCategory.id !== id;
-      })
-    );
+    /* setSubCategories(
+      subCategories.filter((subCategory) => subCategory.id !== id)
+    ); */
   };
 
   const handleNewSubcategory = () => {
-    postSubCategory(newSubCategory);
+    console.log(newSubCategory);
+
+    postSubCategory(category, newSubCategory);
     setNewSubCategory("");
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="mt-32 flex flex-col items-center gap-4">
-      <h2>{category}</h2>
-      <ul>
-        {subCategories.map((subCategory) => (
-          <li
-            className="flex justify-between items-center mb-2"
-            key={subCategory.id}
-          >
-            <span className="text-gray-700">{subCategory.name}</span>
-            <button
-              className="text-red-500 hover:text-red-700"
-              onClick={() => handleDeleteSubCategory(subCategory.id)}
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="relative bg-beige p-8 rounded-lg shadow-lg w-96">
+        <button
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+          onClick={onClose}
+          aria-label="Cerrar modal"
+        >
+          ✕
+        </button>
+        <h2 className="text-2xl font-semibold text-center mb-4">{category}</h2>
+        <ul className="space-y-4">
+          {filteredSubCategories.map((subCategory) => (
+            <li
+              key={subCategory.id}
+              className="flex justify-between items-center bg-gray-100 p-2 rounded-md shadow-sm"
             >
-              Eliminar
+              <span className="text-gray-800">{subCategory.name}</span>
+              <button
+                className="text-red-500 hover:text-red-700"
+                onClick={() => handleDeleteSubCategory(subCategory.id)}
+              >
+                Eliminar
+              </button>
+            </li>
+          ))}
+          <li className="flex gap-2 items-center">
+            <input
+              type="text"
+              placeholder="Nueva subcategoría"
+              value={newSubCategory}
+              onChange={(e) => setNewSubCategory(e.target.value)}
+              className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+            <button
+              onClick={handleNewSubcategory}
+              className="px-4 py-2 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600"
+            >
+              Agregar
             </button>
           </li>
-        ))}
-        <li className="flex justify-between items-center mb-2">
-          <input
-            type="text"
-            placeholder="Agregar nueva categoria"
-            value={newSubCategory}
-            onChange={(e) => setNewSubCategory(e.target.value)}
-          />
-          <button onClick={handleNewSubcategory}>Agregar</button>
-        </li>
-      </ul>
+        </ul>
+      </div>
     </div>
   );
 };

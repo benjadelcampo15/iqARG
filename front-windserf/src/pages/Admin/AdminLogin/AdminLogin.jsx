@@ -1,17 +1,22 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+/* import { useNavigate } from "react-router-dom"; */
 import { useAuth } from "../../../context/AuthContext";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuth();
-  const navigate = useNavigate();
+  /* const navigate = useNavigate(); */
 
   const handleSubmit = (e) => {
+    //ANALIZAR SI LA ALERTA O LA RESPUESTA DEL BACK INCORRECTA LA TENGO QUE MOSTRAR ACA O EN EL CONTEXTO
+    //SI LO QUIERO HACER ACA TENGO QUE USAR AWAIT
     e.preventDefault();
-    if (login(username, password)) {
-      navigate("/admin/dashboard"); // Redirige a la página protegida
+    const response = login(username, password);
+    console.log(response);
+    if (response) {
+      console.log("Logueado");
+      /* navigate("/admin/dashboard"); */ // Redirige a la página protegida
     } else {
       alert("Credenciales incorrectas");
     }

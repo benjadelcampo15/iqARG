@@ -7,7 +7,7 @@ const NavBar = () => {
   const navigate = useNavigate();
 
   const handleSearch = (id) => {
-    navigate(id);
+    navigate(`products/${id}`);
   };
 
   return (
@@ -15,8 +15,10 @@ const NavBar = () => {
       <Link to="/">
         <h1 className="text-red-500 ml-4 text-beige">Logo</h1>
       </Link>
-      <div className="w-96 ml-36">
-        <SearchBar onSearch={handleSearch} />
+      <div className="z-10 w-28rem h-10 relative">
+        <div className="absolute w-full">
+          <SearchBar onSearch={handleSearch} />
+        </div>
       </div>
       <Categories />
     </div>

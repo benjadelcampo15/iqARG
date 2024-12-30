@@ -20,7 +20,6 @@ const Products = () => {
 
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [dynamicSearchParams, setDynamicSearchParams] = useState({});
-  console.log("DynaimcSearchParams: ", dynamicSearchParams);
 
   const isOutlet = category === "Outlet";
 
@@ -30,7 +29,9 @@ const Products = () => {
   useEffect(() => {
     let categoryFormated = category.replace("-", " ");
 
-    if (
+    if (isOutlet) {
+      setValidUrl(true);
+    } else if (
       categories.length > 0 &&
       categories
         .map((cat) => cat.name)
@@ -54,7 +55,7 @@ const Products = () => {
     } else {
       setValidUrl(false);
     }
-  }, [category, subCategory, categories, subCategories]);
+  }, [category, subCategory, categories, subCategories, isOutlet]);
 
   useEffect(() => {
     let productsToFilter = products;
@@ -69,8 +70,13 @@ const Products = () => {
       );
     }
 
-    /* const dynamicSearchParamsWithoutIndex = dynamicSearchParams. */
-    productsToFilter = filterByQuerys(productsToFilter, dynamicSearchParams);
+    if (
+      Object.keys(dynamicSearchParams).length > 1 ||
+      (Object.keys(dynamicSearchParams).length > 0 &&
+        !Object.prototype.hasOwnProperty.call(dynamicSearchParams, "sort"))
+    ) {
+      productsToFilter = filterByQuerys(productsToFilter, dynamicSearchParams);
+    }
 
     if (dynamicSearchParams.sort) {
       productsToFilter = sortProducts(
@@ -82,38 +88,19 @@ const Products = () => {
     setFilteredProducts(productsToFilter);
   }, [products, category, subCategory, dynamicSearchParams, isOutlet]);
 
-  /*   useEffect(() => {
-    if (isOutlet) {
-      setFilteredProducts(products.filter((product) => product.discount));
-    } else {
-      setFilteredProducts(filterByCategory(products, category, subCategory));
-    }
-  }, [category, subCategory, products]);
-
-  useEffect(() => {
-    setFilteredProducts((prevFilteredProducts) =>
-      filterByQuerys(prevFilteredProducts, dynamicSearchParams)
-    );
-
-    if (dynamicSearchParams.sort) {
-      setFilteredProducts((prevFilteredProducts) =>
-        sortProducts(prevFilteredProducts, dynamicSearchParams.sort)
-      );
-    }
-  }, [dynamicSearchParams]); */
-
   function onPageChange(newPage) {
     setCurrentPage(newPage);
   }
 
-  const totalPages = Math.ceil(products.length / productsPerPage);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+
   const currentProducts =
     filteredProducts &&
     filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
-  if (!products || products.length === 0) {
+  if (!filteredProducts || filteredProducts.length === 0) {
     return <Loading message="Cargando productos..." />;
   }
   if (!validUrl) return <NotFoundPage />;
