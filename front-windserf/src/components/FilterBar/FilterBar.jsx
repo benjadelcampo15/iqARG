@@ -1,12 +1,16 @@
-/* eslint-disable react/prop-types */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { createPortal } from "react-dom";
 
 const FilterBar = ({ filteredProducts, setDynamicSearchParams }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState([]);
-  const [activeFilters, setActiveFilters] = useState([]); // Estado para los filtros activos
+  const [activeFilters, setActiveFilters] = useState({});
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+  const [openFilter, setOpenFilter] = useState(null);
+  const [filterPosition, setFilterPosition] = useState(null);
+  const filterMenuRef = useRef(null);
+  const buttonRef = useRef(null);
 
   const createFiltersArray = (filteredProducts) => {
     const allowedFilters = [
@@ -21,34 +25,27 @@ const FilterBar = ({ filteredProducts, setDynamicSearchParams }) => {
     filteredProducts.forEach((product) => {
       allowedFilters.forEach((property) => {
         if (product[property]) {
-          // Asegúrate de que filtersGrouped[property] sea un Set para evitar duplicados
           if (!filtersGrouped[property]) {
             filtersGrouped[property] = new Set();
           }
-
-          // Si product[property] es un array, agrega cada valor al Set
           if (Array.isArray(product[property])) {
             product[property].forEach((value) =>
               filtersGrouped[property].add(value)
             );
           } else {
-            // Si no es un array, simplemente agrega el valor
             filtersGrouped[property].add(product[property]);
           }
         }
       });
     });
 
-    // Convierte los Sets de vuelta a arrays
-    const filtersArray = Object.entries(filtersGrouped).map(([key, value]) => ({
+    return Object.entries(filtersGrouped).map(([key, value]) => ({
       key,
-      values: Array.from(value), // Convierte el Set a un array
+      values: Array.from(value),
     }));
-
-    return filtersArray;
   };
 
-  const handleFilters = (filterKey, filterValue) => {
+  /*   const handleFilters = (filterKey, filterValue) => {
     filterValue = Array.isArray(filterValue) ? filterValue[0] : filterValue;
 
     const url = new URL(window.location.href);
@@ -56,10 +53,7 @@ const FilterBar = ({ filteredProducts, setDynamicSearchParams }) => {
 
     const currentValues = searchParams.get(filterKey)?.split(",") || [];
 
-    console.log("NewSearchParams: ", newSearchParams);
-
     if (currentValues.includes(filterValue)) {
-      //Eliminar el valor si esta seleccionado
       newSearchParams.delete(filterKey);
       setActiveFilters(
         activeFilters.filter(
@@ -71,12 +65,60 @@ const FilterBar = ({ filteredProducts, setDynamicSearchParams }) => {
       setActiveFilters([...activeFilters, filterKey, filterValue]);
     }
 
-    setSearchParams(newSearchParams); // Actualizar los parámetros de búsqueda
+    setSearchParams(newSearchParams);
+  }; */
+
+  const handleFilters = (filterKey, filterValue) => {
+    if (Object.prototype.hasOwnProperty.call(activeFilters, filterKey)) {
+      if (activeFilters[filterKey] === filterValue) {
+        console.log("Lo borra por que es el mismo");
+
+        delete activeFilters[filterKey];
+        setSearchParams((prevParams) => {
+          prevParams.delete(filterKey);
+          return new URLSearchParams(prevParams);
+        });
+      } else {
+        activeFilters[filterKey] = filterValue;
+        setSearchParams((prevParams) => {
+          prevParams.set(filterKey, filterValue);
+          return new URLSearchParams(prevParams);
+        });
+      }
+    } else {
+      activeFilters[filterKey] = filterValue;
+      setSearchParams((prevParams) => {
+        prevParams.set(filterKey, filterValue);
+        return new URLSearchParams(prevParams);
+      });
+    }
+
+    /* const currentValues = searchParams.get(filterKey)?.split(",") || [];
+
+    if (currentValues.includes(filterValue)) {
+      // Deseleccionar el filtro si ya estaba activo
+      setSearchParams((prevParams) => {
+        prevParams.delete(filterKey);
+        return new URLSearchParams(prevParams);
+      });
+      setActiveFilters(
+        activeFilters.filter((filter) => filter !== filterValue)
+      );
+    } else {
+      setSearchParams((prevParams) => {
+        prevParams.set(filterKey, filterValue);
+        return new URLSearchParams(prevParams);
+      });
+      setActiveFilters([...activeFilters, filterValue]);
+    } */
   };
 
   const setFiltersOnce = useCallback(() => {
     setFilters(createFiltersArray(filteredProducts));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setSearchParams(new URLSearchParams());
   }, []);
 
   useEffect(() => {
@@ -84,12 +126,16 @@ const FilterBar = ({ filteredProducts, setDynamicSearchParams }) => {
   }, [setFiltersOnce]);
 
   useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     const url = new URL(window.location.href);
     const params = new URLSearchParams(url.search);
     const resultArray = [];
     params.forEach((value, key) => {
-      console.log(key);
-
       resultArray.push(key, value);
     });
     setActiveFilters(resultArray);
@@ -98,84 +144,167 @@ const FilterBar = ({ filteredProducts, setDynamicSearchParams }) => {
   useEffect(() => {
     const newParams = {};
     searchParams.forEach((value, key) => {
-      newParams[key] = value.split(","); // Convierte a array
+      newParams[key] = value.split(",");
     });
 
     setDynamicSearchParams(newParams);
   }, [searchParams, setDynamicSearchParams]);
 
+  const handleOpenFilter = (filterKey, buttonRef) => {
+    if (openFilter === filterKey) {
+      setOpenFilter(null);
+      return;
+    }
+
+    const rect = buttonRef.getBoundingClientRect();
+    setFilterPosition({
+      top: rect.bottom + window.scrollY,
+      left: rect.left + window.scrollX,
+    });
+
+    setOpenFilter(filterKey);
+  };
+
+  const handleClickOutside = (event) => {
+    if (
+      filterMenuRef.current &&
+      !filterMenuRef.current.contains(event.target)
+    ) {
+      setOpenFilter(null);
+    }
+  };
+  useEffect(() => {
+    let startX = 0;
+    let startY = 0;
+
+    const handleTouchStart = (event) => {
+      const touch = event.touches[0];
+      startX = touch.clientX;
+      startY = touch.clientY;
+    };
+
+    const handleTouchMove = (event) => {
+      const touch = event.touches[0];
+      const deltaX = Math.abs(touch.clientX - startX);
+      const deltaY = Math.abs(touch.clientY - startY);
+
+      // Detectar deslizamiento significativo (10px o más)
+      if (deltaX > 10 || deltaY > 10) {
+        setOpenFilter(null);
+      }
+    };
+
+    if (openFilter !== null) {
+      document.addEventListener("click", handleClickOutside);
+      document.addEventListener("touchstart", handleTouchStart);
+      document.addEventListener("touchmove", handleTouchMove);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchmove", handleTouchMove);
+    };
+  }, [openFilter]);
+
   return (
-    <div className="flex flex-col gap-6 p-4 bg-beige rounded-lg shadow-md w-full">
-      <h3 className="text-xl font-bold text-darkBrown mb-4 border-b pb-2">
+    <div className="w-3/4 sm:w-full p-3 sm:p-4 bg-beige rounded-lg shadow-md">
+      <h3 className="text-lg sm:text-xl font-bold text-darkBrown mb-4 border-b pb-2">
         Filtros
       </h3>
-      {filters.map((filter) => (
-        <div key={filter.key} className="flex flex-col gap-3">
-          <label
-            htmlFor={filter.key}
-            className="block font-medium text-darkBrown mb-1"
-          >
-            {filter.key.charAt(0).toUpperCase() + filter.key.slice(1)}
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {filter.values.map((value, idx) => {
-              const isActive = activeFilters.includes(value);
-              const shouldHide =
-                activeFilters.includes(filter.key) && !isActive;
-
-              return !shouldHide ? (
+      <div
+        className={`flex ${
+          isMobile ? "overflow-x-auto gap-3" : "flex-col gap-6"
+        }`}
+      >
+        {filters.map((filter) => (
+          <div key={filter.key} className="relative">
+            {isMobile ? (
+              <>
                 <button
-                  key={idx}
-                  className={`px-3 py-1 text-sm border border-darkYellow rounded-md transition-all duration-200 ${
-                    isActive
-                      ? "bg-darkYellow text-white" // Filtro activo
-                      : "bg-lightYellow text-darkBrown hover:bg-darkYellow hover:text-white" // Filtro inactivo
-                  }`}
-                  onClick={() => handleFilters(/* idx +  */ filter.key, value)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Evitar conflicto con el evento del documento
+                    handleOpenFilter(filter.key, e.currentTarget);
+                  }}
+                  className={`px-4 py-2 text-sm ${
+                    activeFilters[filter.key]
+                      ? "bg-yellow-600"
+                      : "bg-darkYellow"
+                  }  text-white rounded-md`}
                 >
-                  {value}
+                  {activeFilters[filter.key]
+                    ? activeFilters[filter.key]
+                    : filter.key.charAt(0).toUpperCase() + filter.key.slice(1)}
                 </button>
-              ) : null; // Ocultar el botón si el filtro está activo y no es el actual
-            })}
+
+                {openFilter === filter.key &&
+                  filterPosition &&
+                  createPortal(
+                    <div
+                      ref={filterMenuRef}
+                      className="absolute z-50 bg-white border border-slate-200 rounded-md shadow-lg mt-1"
+                      style={{
+                        position: "absolute",
+                        top: filterPosition.top,
+                        left: filterPosition.left,
+                      }}
+                    >
+                      {filter.values.map((value, idx) => {
+                        const isActive = activeFilters[filter.key] === value;
+                        return (
+                          <button
+                            key={idx}
+                            className={`block w-full px-3 py-1 text-left ${
+                              isActive
+                                ? "bg-darkYellow text-white"
+                                : "hover:bg-lightYellow"
+                            }`}
+                            onClick={() => {
+                              handleFilters(filter.key, value);
+                              setOpenFilter(null);
+                            }}
+                          >
+                            {value}
+                          </button>
+                        );
+                      })}
+                    </div>,
+                    document.body
+                  )}
+              </>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <label className="block font-medium text-darkBrown mb-1">
+                  {filter.key.charAt(0).toUpperCase() + filter.key.slice(1)}
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {filter.values.map((value, idx) => {
+                    const isActive = activeFilters.includes(value);
+                    const shouldHide =
+                      activeFilters.includes(filter.key) && !isActive;
+
+                    return !shouldHide ? (
+                      <button
+                        key={idx}
+                        className={`px-3 py-1 text-sm border border-darkYellow rounded-md transition-all duration-200 ${
+                          isActive
+                            ? "bg-darkYellow text-white"
+                            : "bg-lightYellow text-darkBrown hover:bg-darkYellow hover:text-white"
+                        }`}
+                        onClick={() => handleFilters(filter.key, value)}
+                      >
+                        {value}
+                      </button>
+                    ) : null;
+                  })}
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
-
-  /* return (
-    <div className="flex flex-col gap-6 p-4 bg-beige rounded-lg shadow-md w-full">
-      <h3 className="text-xl font-bold text-darkBrown mb-4 border-b pb-2">
-        Filtros
-      </h3>
-      {filters.map((filter) => (
-        <div key={filter.key} className="flex flex-col gap-3">
-          <label
-            htmlFor={filter.key}
-            className="block font-medium text-darkBrown mb-1"
-          >
-            {filter.key.charAt(0).toUpperCase() + filter.key.slice(1)}
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {filter.values.map((value, idx) => (
-              <button
-                key={idx}
-                className={`px-3 py-1 text-sm border border-darkYellow rounded-md transition-all duration-200 ${
-                  searchParams.has(filter.key) &&
-                  searchParams.get(filter.key).split(",").includes(value)
-                    ? "bg-darkYellow text-white" // Filtro activo
-                    : "bg-lightYellow text-darkBrown hover:bg-darkYellow hover:text-white" // Filtro inactivo
-                }`}
-                onClick={() => handleFilters(filter.key, value)}
-              >
-                {value}
-              </button>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  ); */
 };
 
 export default FilterBar;

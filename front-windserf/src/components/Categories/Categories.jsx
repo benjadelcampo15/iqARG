@@ -1,22 +1,71 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useProducts } from "../../context/ProductContext";
+import { useState } from "react";
 
-const Categories = () => {
+const Categories = ({ onCategoryClick }) => {
   const { categories } = useProducts();
+  const navigate = useNavigate();
+  const [openCategory, setOpenCategory] = useState(null); // Estado para la categoría activa
+
+  const handleMouseEnter = (categoryName) => {
+    if (window.innerWidth >= 1024) {
+      setOpenCategory(categoryName);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (window.innerWidth >= 1024) {
+      setOpenCategory(null);
+    }
+  };
+
+  const handleCategoryClick = (categoryName) => {
+    if (window.innerWidth < 1024 && openCategory !== null) {
+      navigate(`${openCategory}`);
+      setOpenCategory(null);
+      onCategoryClick?.();
+    } else if (window.innerWidth < 1024) {
+      setOpenCategory(openCategory === categoryName ? null : categoryName);
+    }
+  };
+
+  const handleSubCategoryClick = () => {
+    setOpenCategory(null); // Cierra cualquier categoría abierta
+    onCategoryClick?.(); // Ejecuta la acción pasada como prop
+  };
+
   return (
-    <div className="flex flex-row mr-6 text-beige z-20">
+    <div className="flex flex-wrap lg:flex-row lg:mr-6 text-brown lg:text-beige z-50">
       {categories.map((category) => (
-        <div key={category.name} className="relative group">
-          <Link to={`/${category.name}`}>
-            <h2 className="mx-6 font-open_sans">{category.name}</h2>
-          </Link>
-          <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-transform duration-300 ease-out scale-y-0 origin-top group-hover:scale-y-100">
+        <div
+          key={category.name}
+          className="relative group lg:mx-4 flex flex-col items-center lg:items-start"
+          onMouseEnter={() => handleMouseEnter(category.name)} // Abre el menú al pasar el mouse
+          onMouseLeave={handleMouseLeave} // Cierra el menú al salir del hover
+        >
+          {/* Categoría principal */}
+          <button
+            className="flex items-center justify-between w-full px-4 py-2 lg:px-0 lg:py-0 font-open_sans lg:hover:text-white"
+            onClick={() => handleCategoryClick(category.name)} // Solo se activa en pantallas pequeñas
+          >
+            {category.name}
+          </button>
+
+          {/* Subcategorías */}
+          <div
+            className={`absolute z-50 top-full lg:left-1/2 lg:transform lg:-translate-x-1/2 mt-2 lg:w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-all duration-300 ease-in-out ${
+              openCategory === category.name
+                ? "block opacity-100"
+                : "hidden opacity-0"
+            }`}
+          >
             <div className="py-1">
               {category.subCategories.map((subcategory) => (
                 <Link
                   key={subcategory.name}
                   to={`/${category.name}/${subcategory.name}`}
                   className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
+                  onClick={handleSubCategoryClick}
                 >
                   {subcategory.name}
                 </Link>
@@ -26,126 +75,6 @@ const Categories = () => {
         </div>
       ))}
     </div>
-    /* <div className="flex flex-row mr-6 text-beige z-20">
-      <div className="relative group">
-        <Link to="windsurf">
-          <h2 className="mx-6 font-open_sans">WindSurf</h2>
-        </Link>
-        <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-transform duration-300 ease-out scale-y-0 origin-top group-hover:scale-y-100">
-          <div className="py-1">
-            <Link
-              to="windsurf/tablas"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Tablas
-            </Link>
-            <Link
-              to="windsurf/velas"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Velas
-            </Link>
-            <Link
-              to="windsurf/mastiles"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Mastiles
-            </Link>
-            <Link
-              to="windsurf/estrellas"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Estrellas
-            </Link>
-            <Link
-              to="windsurf/extensores"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Extensores
-            </Link>
-            <Link
-              to="windsurf/botavaras"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Botavaras
-            </Link>
-            <Link
-              to="windsurf/accesorios-y-repuestos"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Accesorios y repuestos
-            </Link>
-          </div>
-        </div>
-      </div>
-      <div className="relative group">
-        <Link to="/foil">
-          <h2 className="mx-6 font-open_sans">Foil</h2>
-        </Link>
-        <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-transform duration-300 ease-out scale-y-0 origin-top group-hover:scale-y-100">
-          <div className="py-1">
-            <Link
-              to="/foil/foil-completos"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Foil completos
-            </Link>
-            <Link
-              to="/foil/mastiles-y-fuselajes"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Mastiles y fuselajes
-            </Link>
-            <Link
-              to="/foil/alas"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Alas
-            </Link>
-            <Link
-              to="/foil/accesorios-y-repuestos"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Accesorios y repuestos
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <div className="relative group">
-        <Link to="/wing-foil">
-          <h2 className="mx-6 font-open_sans">Wing Foil</h2>
-        </Link>
-        <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-transform duration-300 ease-out scale-y-0 origin-top group-hover:scale-y-100">
-          <div className="py-1">
-            <Link
-              to="/wing-foil/wings"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Wings
-            </Link>
-            <Link
-              to="/wing-foil/tablas"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Tablas
-            </Link>
-            <Link
-              to="/wing-foil/boomstraps"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Boomstraps
-            </Link>
-            <Link
-              to="/wing-foil/accesorios-y-repuestos"
-              className="block px-4 py-2 text-sm text-brown hover:bg-slate-50"
-            >
-              Accesorios y repuestos
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div> */
   );
 };
 

@@ -1,11 +1,6 @@
 export const filterByCategory = (products, category, subCategory) => {
   return products.filter((product) => {
-    console.log("URL ", category);
-
-    console.log(product.category.name);
-
     const productCategory = product.category.name; //.replace(" ", "-")
-    console.log(productCategory);
 
     if (subCategory) {
       return (

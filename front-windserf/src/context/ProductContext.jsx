@@ -94,9 +94,11 @@ export const ProductProvider = ({ children }) => {
     setTriggerFetch((prev) => !prev);
   };
 
-  const addView = (productId, userId) => {
-    /* axios.put("..../products/" + productId + "/view", { productId, userId }); */
-  };
+  const addView = useCallback(async (productId, userId) => {
+    await axios.post(`http://localhost:3000/products/${productId}/view`, {
+      userId,
+    });
+  }, []);
 
   useEffect(() => {
     fetchProducts();

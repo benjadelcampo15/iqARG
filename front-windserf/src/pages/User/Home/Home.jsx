@@ -11,52 +11,75 @@ import { EffectCoverflow, Navigation } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/scrollbar";
 import "swiper/css/effect-coverflow";
 
-import "./Swiper.css";
 import { useProducts } from "../../../context/ProductContext";
 import { useEffect, useState } from "react";
 
 const Home = () => {
   const { products } = useProducts();
   const [outletProducts, setOutletProducts] = useState([]);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  // Detectar si el dispositivo es táctil
+  useEffect(() => {
+    const checkTouchDevice = () => {
+      setIsTouchDevice(
+        "ontouchstart" in window || navigator.maxTouchPoints > 0
+      );
+    };
+
+    checkTouchDevice();
+  }, []);
 
   useEffect(() => {
-    // Filtrar productos de la categoría "Outlet"
     const filteredProducts = products.filter(
       (product) => product.discount !== null
     );
-    setOutletProducts(filteredProducts.slice(0, 8)); // Mostrar los primeros 8 productos
+    setOutletProducts(filteredProducts.slice(0, 8));
   }, [products]);
+
   return (
-    <main className="flex flex-col bg-red">
+    <main className="flex flex-col">
       <section className="flex w-full justify-center pt-4">
-        {/* <img className="w-2/3 rounded" src={background} alt="" /> */}
         <Swiper
           centeredSlides={true}
-          slidesPerView={2}
-          spaceBetween={10}
+          slidesPerView={window.innerWidth >= 640 ? 2 : 1}
+          spaceBetween={0}
           initialSlide={1}
           modules={[EffectCoverflow, Navigation]}
           effect="coverflow"
-          coverflowEffect={{
-            rotate: 50,
-            stretch: 65,
-            depth: 860,
-            scale: 1.15,
-            modifier: 1,
-            slideShadows: true,
-          }}
-          className="w-full relative z-10"
-          style={{ height: "71vh" }}
+          coverflowEffect={
+            window.innerWidth >= 640
+              ? {
+                  rotate: 50,
+                  stretch: 65,
+                  depth: 860,
+                  scale: 1.15,
+                  modifier: 1,
+                  slideShadows: true,
+                }
+              : {
+                  rotate: 50,
+                  stretch: 65,
+                  depth: 860,
+                  scale: 1.15,
+                  modifier: 1,
+                  slideShadows: true,
+                }
+          }
+          className="w-11/12 sm:w-full rounded-lg sm:rounded relative z-10 "
+          style={
+            window.innerWidth >= 640 ? { height: "71vh" } : { height: "60vh" }
+          }
           navigation={true}
         >
           <SwiperSlide>
             <div className="w-full h-full relative">
               <Link
-                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-3xl font-semibold opacity-0 hover:opacity-100 transition-opacity duration-300"
+                className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-3xl font-semibold ${
+                  isTouchDevice ? "opacity-50" : "opacity-0 hover:opacity-100"
+                } transition-opacity duration-300`}
                 to="/Windsurf"
               >
                 Windsurf
@@ -71,7 +94,9 @@ const Home = () => {
           <SwiperSlide>
             <div className="w-full h-full relative">
               <Link
-                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-3xl font-semibold opacity-0 hover:opacity-100 transition-opacity duration-300"
+                className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-3xl font-semibold ${
+                  isTouchDevice ? "opacity-50" : "opacity-0 hover:opacity-100"
+                } transition-opacity duration-300`}
                 to="/Foil"
               >
                 Foil
@@ -86,7 +111,9 @@ const Home = () => {
           <SwiperSlide>
             <div className="w-full h-full relative">
               <Link
-                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-3xl font-semibold opacity-0 hover:opacity-100 transition-opacity duration-300"
+                className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-3xl font-semibold ${
+                  isTouchDevice ? "opacity-50" : "opacity-0 hover:opacity-100"
+                } transition-opacity duration-300`}
                 to="/Wing foil"
               >
                 Wing Foil
@@ -100,33 +127,37 @@ const Home = () => {
           </SwiperSlide>
         </Swiper>
       </section>
+
       <section className="flex flex-col w-4/5 m-auto mt-14">
-        <h2 className="text-brown text-5xl mb-6">Outlet</h2>
-        <div className="flex flex-row flex-wrap w-11/12 mx-auto justify-center">
+        <h2 className="text-brown text-4xl self-center sm:self-start sm:text-5xl mb-6">
+          Outlet
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-11/12 mx-auto justify-center">
           {outletProducts.map((product) => (
             <Product key={product.id} product={product} />
           ))}
         </div>
         <Link
           to="/Outlet"
-          className="w-2/12 mt-3 p-2 px-4 self-center text-center bg-lightYellow rounded-3xl text-black hover:bg-darkYellow transition-colors duration-300"
+          className="w-8/12 sm:w-5/12 md:w-3/12 lg:w-2/12 mt-3 p-2 px-4 self-center text-center bg-lightYellow rounded-3xl text-black hover:bg-darkYellow transition-colors duration-300"
         >
-          Ver mas
+          Ver más
         </Link>
       </section>
+
       <section className="flex flex-col mt-14 items-center">
-        <h2 className=" text-brown text-4xl mb-6">Contacto</h2>
-        <h5 className="mb-2">+5492613748269</h5> {/* whatsapp */}
-        <h5 className="mb-4">tomasguignet9@gmail.com</h5> {/* mail */}
-        <div className="flex flex-row ">
-          <button className="mx-2">
-            <img className="w-7 mb-2" src={instagram} alt="" />
+        <h2 className="text-brown text-3xl sm:text-4xl mb-6">Contacto</h2>
+        <h5 className="mb-2">+5492613748269</h5>
+        <h5 className="mb-4">tomasguignet9@gmail.com</h5>
+        <div className="flex space-x-4">
+          <button>
+            <img className="w-6 sm:w-7" src={instagram} alt="Instagram" />
           </button>
-          <button className="mx-2">
-            <img className="w-7 mb-2" src={facebook} alt="" />
+          <button>
+            <img className="w-6 sm:w-7" src={facebook} alt="Facebook" />
           </button>
-          <button className="mx-2">
-            <img className="w-8 mb-2" src={twitter} alt="" />
+          <button>
+            <img className="w-6 sm:w-8" src={twitter} alt="Twitter" />
           </button>
         </div>
       </section>

@@ -1,12 +1,10 @@
 const Footer = () => {
   return (
-    <footer className="flex flex-row h-20 mt-4 p-6 bg-beige justify-between items-center">
-      <div>
-        <p>© Copyright iQ Foil</p>
-      </div>
-      <div>
-        <p>Todos los derechos reservados</p>
-      </div>
+    <footer className="flex flex-col mt-7 sm:flex-row items-center justify-between h-auto sm:h-20 py-4 px-6 bg-beige text-center sm:text-left">
+      <p className="text-sm sm:text-base">© Copyright iQ Foil</p>
+      <p className="text-sm sm:text-base mt-2 sm:mt-0">
+        Todos los derechos reservados
+      </p>
     </footer>
   );
 };

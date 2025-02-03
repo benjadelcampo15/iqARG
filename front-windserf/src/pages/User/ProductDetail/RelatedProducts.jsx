@@ -12,11 +12,11 @@ const RelatedProducts = ({ category, subCategory }) => {
   );
 
   return (
-    <section className="mt-12">
+    <section className="w-full mt-12">
       <h2 className="mb-3 text-3xl font-medium self-center justify-self-center">
         Productos relacionados
       </h2>
-      <div className="flex">
+      <div className="flex overflow-x-auto">
         {relatedProducts.map((product) => (
           <Product key={product.id} product={product} />
         ))}

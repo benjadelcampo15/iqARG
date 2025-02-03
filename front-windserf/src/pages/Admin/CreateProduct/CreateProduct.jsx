@@ -22,7 +22,19 @@ const CreateProduct = () => {
   };
 
   const handleImageUpload = (e) => {
-    setFormData({ ...formData, img: e.target.files[0].name });
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onloadend = async () => {
+        const base64Image = reader.result;
+        console.log("Base64 Image:", base64Image);
+
+        setFormData({ ...formData, img: base64Image });
+      };
+
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleCategoryChange = (categoryName) => {
@@ -50,13 +62,23 @@ const CreateProduct = () => {
     e.preventDefault();
     console.log("Datos del producto:", formData);
     postProduct(formData);
+    setFormData({
+      name: "",
+      brand: "",
+      price: 0,
+      stock: 0,
+      description: "",
+      img: null,
+      category: "",
+      subCategory: "",
+    });
   };
 
   return (
     <form onSubmit={handleSubmit} className="p-4 max-w-2xl mx-auto">
       <h2 className="text-xl font-bold mb-4">Crear Producto</h2>
       <div className="mb-4">
-        <label className="block text-sm font-medium">Categoría</label>
+        <label className="block text-sm font-medium">Categoría *</label>
         <select
           value={formData.category}
           onChange={(e) => handleCategoryChange(e.target.value)}
@@ -76,7 +98,7 @@ const CreateProduct = () => {
 
       {formData.category && (
         <div className="mb-4">
-          <label className="block text-sm font-medium">Subcategoría</label>
+          <label className="block text-sm font-medium">Subcategoría *</label>
           <select
             value={formData.subCategory}
             onChange={(e) => handleSubcategoryChange(e.target.value)}
@@ -99,7 +121,9 @@ const CreateProduct = () => {
         </div>
       )}
       <div className="mb-4">
-        <label className="block text-sm font-medium">Nombre del Producto</label>
+        <label className="block text-sm font-medium">
+          Nombre del Producto *
+        </label>
         <input
           type="text"
           name="name"
@@ -110,7 +134,7 @@ const CreateProduct = () => {
         />
       </div>
       <div className="mb-4">
-        <label className="block text-sm font-medium">Marca</label>
+        <label className="block text-sm font-medium">Marca *</label>
         <input
           type="text"
           name="brand"
@@ -121,7 +145,7 @@ const CreateProduct = () => {
         />
       </div>
       <div className="mb-4">
-        <label className="block text-sm font-medium">Precio</label>
+        <label className="block text-sm font-medium">Precio *</label>
         <input
           type="number"
           name="price"
@@ -142,7 +166,7 @@ const CreateProduct = () => {
         />
       </div>
       <div className="mb-4">
-        <label className="block text-sm font-medium">Descripción</label>
+        <label className="block text-sm font-medium">Descripción *</label>
         <textarea
           name="description"
           value={formData.description}
@@ -153,7 +177,7 @@ const CreateProduct = () => {
         />
       </div>
       <div className="mb-4">
-        <label className="block text-sm font-medium">Imagen</label>
+        <label className="block text-sm font-medium">Imagen *</label>
         <input
           type="file"
           onChange={handleImageUpload}

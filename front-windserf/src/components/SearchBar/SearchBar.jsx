@@ -42,7 +42,11 @@ const SearchBar = ({ onSearch }) => {
   }; */
 
   return (
-    <div className="flex flex-col max-w-full bg-beige p-2 rounded-lg text-sm md:text-base">
+    <div
+      className={`flex flex-col justify-center ${
+        filteredProducts?.length > 0 ? "h-auto" : "h-8"
+      } md:h-auto max-w-full bg-beige p-2 rounded-lg md:text-base`}
+    >
       {/* Barra de búsqueda */}
       <div className="flex justify-between bg-beige rounded-full">
         {/* VER COMO APLICAR ESTILO PARA QUE SE BORRE LO ESCRITO AL SELECCIONAR UN PRODUCTO O AL CLICKEAR FUERA DE LA BARRA */}
@@ -54,7 +58,7 @@ const SearchBar = ({ onSearch }) => {
           onChange={handleInputChange}
         />
 
-        <div className="w-4 h-4 mt-1 mr-1">
+        <div className="w-4 h-2 md:h-4 self-center">
           <img src={lupa} alt="Buscar" />
         </div>
       </div>

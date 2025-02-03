@@ -50,23 +50,32 @@ const OrderButton = ({ setDynamicSearchParams }) => {
   }, [searchParams, setDynamicSearchParams]);
 
   return (
-    <div className="relative inline-block text-left mb-4" ref={menuRef}>
+    <div
+      className="relative w-1/4 sm:w-auto inline-block text-left mb-4 mr-2 sm:mr-0 z-30"
+      ref={menuRef}
+    >
       <button
-        className="inline-flex justify-between items-center w-full rounded-md border border-light-gray shadow-sm px-4 py-2 bg-beige text-sm font-medium text-dark-gray hover:bg-light-gray"
+        className="inline-flex justify-between items-center w-full rounded-md border border-light-gray shadow-sm px-3 sm:px-4 py-2 bg-beige text-sm font-medium text-dark-gray hover:bg-light-gray"
         onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
         {selectedOption}
-        {isMenuOpen ? <FiChevronUp /> : <FiChevronDown />}
+        {window.innerWidth > 640 ? (
+          isMenuOpen ? (
+            <FiChevronUp />
+          ) : (
+            <FiChevronDown />
+          )
+        ) : null}
       </button>
 
       {isMenuOpen && (
-        <div className="absolute mt-4 w-56 max-w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-transform transform duration-200 ease-in-out">
+        <div className="absolute mt-4 sm:w-56 sm:max-w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 transition-transform transform duration-200 ease-in-out">
           <div className="py-1">
             {options.map((option) => (
               <button
                 key={option}
                 onClick={() => handleOptionClick(option)}
-                className="block w-full text-left px-4 py-2 text-sm text-dark-gray hover:bg-light-gray"
+                className="block w-full text-left px-4 py-2 text-sm text-dark-gray hover:bg-slate-50"
               >
                 {option}
               </button>

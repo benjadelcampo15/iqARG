@@ -86,6 +86,8 @@ const Products = () => {
     }
 
     setFilteredProducts(productsToFilter);
+
+    /* productFiltering(); */
   }, [products, category, subCategory, dynamicSearchParams, isOutlet]);
 
   function onPageChange(newPage) {
@@ -106,9 +108,9 @@ const Products = () => {
   if (!validUrl) return <NotFoundPage />;
 
   return (
-    <main className="flex flex-row gap-6 px-6 py-4">
+    <main className="flex flex-col sm:flex-row items-center sm:items-stretch gap-6 px-6 py-4">
       {/* Sidebar */}
-      <aside className="flex flex-col w-1/5 bg-beige rounded-lg p-4 shadow-md">
+      <aside className="flex flex-row sm:flex-col w-11/12 sm:w-1/4 box-content bg-beige rounded-lg pr-5 pl-3 py-3 sm:p-4 gap-1 sm:gap-0 shadow-md">
         <OrderButton setDynamicSearchParams={setDynamicSearchParams} />
         <FilterBar
           filteredProducts={filteredProducts}
@@ -116,7 +118,6 @@ const Products = () => {
         />
       </aside>
 
-      {/* Main content */}
       <section className="flex flex-col items-center w-4/5">
         <div className="flex flex-row items-center justify-center gap-2 mb-4">
           <Link to="/" className="text-xl text-darkBrown hover:underline">
