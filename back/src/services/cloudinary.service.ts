@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+/* import { Injectable } from '@nestjs/common';
 import * as toStream from 'buffer-to-stream';
 import { UploadApiErrorResponse, v2 } from 'cloudinary';
 
@@ -24,4 +24,4 @@ export class CloudinaryService {
       toStream(file.buffer).pipe(upload);
     });
   }
-}
+} */

@@ -7,6 +7,10 @@ import { SubCategory } from 'src/entities/subCategory';
 import { View } from 'src/entities/view';
 import { products } from 'src/utils/products';
 import { Repository } from 'typeorm';
+import cloudinary from '../utils/cloudinary';
+
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ProductService implements OnModuleInit {
@@ -44,6 +48,29 @@ export class ProductService implements OnModuleInit {
         const subCategory = await this.subCategoryRepository.findOne({
           where: { name: product.subCategory },
         });
+
+        if (existsCat.length !== 0 && exists.length === 0) {
+          for (const product of products) {
+            const imagePath = path.join(
+              `../../../front-windserf/src/images`,
+              `${product.subCategory} ${product.category}`,
+            );
+
+            // Buscar la imagen con múltiples extensiones
+            const possibleExtensions = ['.jpg', '.png', '.jpeg'];
+            for (const extension of possibleExtensions) {
+              const fullImagePath = `${imagePath}${extension}`;
+
+              console.log(path.join(__dirname, fullImagePath));
+
+              if (fs.existsSync(path.join(__dirname, fullImagePath))) {
+                product.img = fullImagePath;
+                break;
+              }
+            }
+            console.log(product.img);
+          }
+        }
 
         // Guardar el producto con su propia categoría y subcategoría
         await this.productRepository.save({
@@ -88,7 +115,6 @@ export class ProductService implements OnModuleInit {
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-    console.log(product);
 
     return product;
   }
@@ -108,6 +134,25 @@ export class ProductService implements OnModuleInit {
           `SubCategory ${product.subCategory} not found`,
         );
       }
+
+      const uploadResult = await cloudinary.uploader
+        .upload(product.img, {
+          public_id: product.name,
+        })
+        .catch((error) => {
+          console.error('Error al subir la imagen:', error);
+          return null; // Asegúrate de devolver un valor manejable
+        });
+
+      if (!uploadResult || !uploadResult.secure_url) {
+        throw new Error('No se pudo subir la imagen a Cloudinary');
+      }
+
+      /* const optimizeUrl = await cloudinary.url(product.name, {
+        fetch_format: 'auto',
+        quality: 'auto',
+      }); */
+
       await this.productRepository.save({
         name: product.name,
         price: product.price,
@@ -118,7 +163,7 @@ export class ProductService implements OnModuleInit {
         material: product.material,
         size: product.size,
         measurement: product.measurement,
-        img: product.img,
+        img: uploadResult.secure_url,
         subCategory: subCategory,
         category: category,
         discount: product.discount,
@@ -129,7 +174,6 @@ export class ProductService implements OnModuleInit {
         relations: ['subCategory', 'subCategory.category'],
       });
 
-      console.log(newProduct);
       return newProduct;
     } catch (error) {
       throw new Error(`Failed to add product: ${error.message}`);
@@ -146,6 +190,24 @@ export class ProductService implements OnModuleInit {
     }
 
     delete product.views;
+
+    if (product.img !== existingProduct.img) {
+      await cloudinary.uploader.destroy(product.name);
+      const uploadResult = await cloudinary.uploader
+        .upload(product.img, {
+          public_id: product.name,
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      console.log(uploadResult);
+
+      const optimizeUrl = await cloudinary.url(product.name, {
+        fetch_format: 'auto',
+        quality: 'auto',
+      });
+      product.img = optimizeUrl;
+    }
 
     // Actualizar el producto
     await this.productRepository.update(id, product);
@@ -164,6 +226,54 @@ export class ProductService implements OnModuleInit {
     console.log(updatedProduct);
 
     return updatedProduct;
+  }
+
+  async addProductView(userId: string, productId: string) {
+    const lastView = await this.viewRepository.findOne({
+      where: { userId, productId },
+      order: { createdAt: 'DESC' },
+    });
+
+    console.log('Last view: ', lastView);
+
+    if (lastView) {
+      const oneHourInMilliseconds = 1 * 60 * 60 * 1000;
+
+      const [datePart, timePart] = lastView.createdAt.split(', '); // Separar por coma y espacio
+      const [day, month, year] = datePart.split('/'); // Separar la fecha en día, mes, año
+      const [hours, minutes, seconds] = timePart.split(':'); // Separar la hora en horas, minutos, segundos
+
+      // Crear un objeto Date con la fecha y hora correctas
+      const lastViewDate = new Date(
+        Number(year), // Año
+        Number(month) - 1, // Mes (0-based index)
+        Number(day), // Día
+        Number(hours), // Hora
+        Number(minutes), // Minutos
+        Number(seconds), // Segundos
+      );
+
+      const timeSinceLastView = Date.now() - lastViewDate.getTime(); // Convert to Date object
+
+      /*       console.log(Date.now());
+      console.log(lastViewDate);
+
+      console.log('Tiempo de la ultima vista: ', timeSinceLastView);
+      console.log('Una hora: ', oneHourInMilliseconds); */
+
+      if (timeSinceLastView < oneHourInMilliseconds) {
+        /*         console.log('No se registra vista'); */
+        return;
+      }
+    }
+
+    const newView = await this.viewRepository.create({
+      userId,
+      productId,
+    });
+    console.log('Se registra la vista: ', newView);
+
+    return await this.viewRepository.save(newView);
   }
 
   async deleteProduct(id: string): Promise<void> {

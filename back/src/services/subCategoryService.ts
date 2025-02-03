@@ -24,7 +24,7 @@ export class subCategoryService implements OnModuleInit {
         const category = await this.categoryRepository.findOne({
           where: { name: subCategory.category },
         });
-        console.log(category);
+        //console.log(category);
         // console.log(subCategory.category);
 
         if (category) {
